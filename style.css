@@ -57,6 +57,10 @@
   justify-content: space-between;
 }
 
+#vdp-month-name {
+  margin-inline-end: 0.3rem;
+}
+
 #vdp-prev-month,
 #vdp-next-month {
   background-color: rgba(169, 169, 169, 0.1);
