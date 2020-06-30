@@ -56,12 +56,16 @@ class ViotDatePicker {
   };
 
   #renderDays = () => {
-    const currentDate = new Date();
+    const thisDate = new Date();
+    const maxRender = 36;
+
+    const currentDate = (i) =>
+      new Date(this.#date.getFullYear(), this.#date.getMonth(), i);
 
     const isToday = (day) =>
-      this.#date.getFullYear() === currentDate.getFullYear() &&
-      this.#date.getMonth() === currentDate.getMonth() &&
-      currentDate.getDate() === day;
+      this.#date.getFullYear() === thisDate.getFullYear() &&
+      this.#date.getMonth() === thisDate.getMonth() &&
+      thisDate.getDate() === day;
 
     const maxDays = new Date(
       this.#date.getFullYear(),
@@ -69,14 +73,15 @@ class ViotDatePicker {
       0,
     ).getDate();
 
-    const days = [...Array(maxDays + 1).keys()].slice(1);
     const daysWrapper = document.createDocumentFragment();
     daysWrapper.id = `${this.#prefix}-days`;
 
-    for (const day of days) {
+    for (let i = 0; i <= maxRender; i++) {
       const dayNode = document.createElement('div');
 
-      if (isToday(day)) dayNode.className = '--today';
+      if (isToday(currentDate(i).getDate())) dayNode.classList.add('--today');
+      if (currentDate(i).getMonth() !== this.#date.getMonth())
+        dayNode.classList.add('--dimmed');
 
       dayNode.addEventListener('click', () => {
         const selectedClassName = '--selected';
@@ -88,7 +93,7 @@ class ViotDatePicker {
         dayNode.classList.add(selectedClassName);
       });
 
-      dayNode.innerText = day;
+      dayNode.innerText = currentDate(i).getDate();
       daysWrapper.appendChild(dayNode);
     }
 

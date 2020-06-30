@@ -91,7 +91,7 @@
  */
 #vdp-days {
   display: grid;
-  grid-template-columns: repeat(10, 1fr);
+  grid-template-columns: repeat(7, 1fr);
   grid-gap: 0.5rem;
   margin-top: 1rem;
   margin-bottom: 1rem;
@@ -104,6 +104,10 @@
   font-size: 0.9em;
   cursor: pointer;
   border-radius: 0.1rem;
+}
+
+#vdp-days > div.--dimmed:not(.--selected) {
+  opacity: 0.5;
 }
 
 #vdp-days > div.--today {
