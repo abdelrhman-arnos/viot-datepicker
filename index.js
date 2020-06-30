@@ -31,6 +31,10 @@ class ViotDatePicker {
     })();
   }
 
+  getDate() {
+    return this.#date;
+  }
+
   #update = () => {
     const daysWrapper = document.getElementById(`${this.#prefix}-days`);
     document.getElementById(
@@ -57,7 +61,7 @@ class ViotDatePicker {
 
   #renderDays = () => {
     const thisDate = new Date();
-    const maxRender = 36;
+    const maxRender = 42;
 
     const currentDate = (i) =>
       new Date(this.#date.getFullYear(), this.#date.getMonth(), i);
@@ -67,16 +71,10 @@ class ViotDatePicker {
       this.#date.getMonth() === thisDate.getMonth() &&
       thisDate.getDate() === day;
 
-    const maxDays = new Date(
-      this.#date.getFullYear(),
-      this.#date.getMonth(),
-      0,
-    ).getDate();
-
     const daysWrapper = document.createDocumentFragment();
     daysWrapper.id = `${this.#prefix}-days`;
 
-    for (let i = 0; i <= maxRender; i++) {
+    for (let i = 0; i < maxRender; i++) {
       const dayNode = document.createElement('div');
 
       if (isToday(currentDate(i).getDate())) dayNode.classList.add('--today');
@@ -91,6 +89,9 @@ class ViotDatePicker {
 
         if (selectedNode) selectedNode.classList.remove(selectedClassName);
         dayNode.classList.add(selectedClassName);
+
+        this.#date = currentDate(i);
+        console.log(this.#date);
       });
 
       dayNode.innerText = currentDate(i).getDate();
