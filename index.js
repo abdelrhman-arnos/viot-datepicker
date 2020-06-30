@@ -16,6 +16,7 @@ class ViotDatePicker {
   #year = 'numeric';
   #month = 'long';
   #day = 'numeric';
+  #weekday = 'short';
 
   constructor({ selector, lang, date, year, month, day }) {
     this.#selector = selector || this.#selector;
@@ -57,6 +58,27 @@ class ViotDatePicker {
     yearNode.innerText = this.#date.getFullYear();
 
     return yearNode;
+  };
+
+  #week = () => {
+    const date = new Date('2020', '00', '05');
+    const weekWrapper = document.createElement('div');
+    weekWrapper.id = `${this.#prefix}-week`;
+
+    for (let i = 0; i < 7; i++) {
+      const weekday = document.createElement('span');
+
+      const dayName = new Date(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate() + i,
+      ).toLocaleDateString(this.#lang, { weekday: this.#weekday });
+
+      weekday.innerText = dayName;
+      weekWrapper.appendChild(weekday);
+    }
+
+    return weekWrapper;
   };
 
   #renderDays = () => {
@@ -183,10 +205,13 @@ class ViotDatePicker {
     const wrapper = document.createElement('div');
     wrapper.className = `${this.#prefix}-wrapper`;
 
-    /* Render all months */
+    /* render all months */
     wrapper.appendChild(this.#monthWrapper());
 
-    /* Render all days in this month */
+    /* render all weekdays */
+    wrapper.appendChild(this.#week());
+
+    /* render all days in this month */
     const daysWrapper = document.createElement('div');
     daysWrapper.id = `${this.#prefix}-days`;
     daysWrapper.appendChild(this.#renderDays());

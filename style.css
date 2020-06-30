@@ -23,6 +23,25 @@
   position: relative;
 }
 
+/**
+ * week
+ */
+#vdp-week {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.8em;
+  margin-top: 1rem;
+}
+
+#vdp-week > span {
+  width: 2.5rem;
+  text-align: center;
+}
+
+/**
+ * today
+ */
 .vdp-today {
   position: absolute;
   left: 50%;
@@ -93,7 +112,7 @@
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   grid-gap: 0.5rem;
-  margin-top: 1rem;
+  margin-top: 0.5rem;
   margin-bottom: 1rem;
 }
 
