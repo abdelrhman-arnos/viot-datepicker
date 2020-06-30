@@ -7,23 +7,9 @@
   document.head.appendChild(stylesheet);
 })();
 
-const prefix = 'vdp';
-const monthNames = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
-];
-
 class ViotDatePicker {
+  #prefix = 'vdp';
+
   #selector = 'viot-dp';
   #lang = 'en-US';
   #date = new Date();
@@ -45,39 +31,52 @@ class ViotDatePicker {
     })();
   }
 
-  #renderMonths = () => {
-    const monthsWrapper = document.createElement('div');
-    monthsWrapper.id = `${prefix}-months`;
+  #update = () => {
+    const daysWrapper = document.getElementById(`${this.#prefix}-days`);
+    document.getElementById(
+      `${this.#prefix}-month-name`,
+    ).innerText = this.#date.toLocaleDateString(this.#lang, {
+      month: this.#month,
+    });
 
-    for (const month of monthNames) {
-      // const shortName = month.toLowerCase().slice(0, 3);
-      const monthNode = document.createElement('div');
-      monthNode.innerText = month;
-      // monthNode.className = `${prefix}-${shortName}`;
-      monthsWrapper.appendChild(monthNode);
-    }
+    document.getElementById(
+      `${this.#prefix}-year`,
+    ).innerText = this.#date.getFullYear();
 
-    return monthsWrapper;
+    daysWrapper.innerHTML = '';
+    daysWrapper.append(this.#renderDays());
   };
 
-  #renderYear = () => {
+  #yearNode = () => {
     const yearNode = document.createElement('span');
-    yearNode.id = `${prefix}-year`;
+    yearNode.id = `${this.#prefix}-year`;
     yearNode.innerText = this.#date.getFullYear();
 
     return yearNode;
   };
 
   #renderDays = () => {
-    const currentDay = new Date().getDate();
-    const days = [...Array(32).keys()].slice(1);
-    const daysWrapper = document.createElement('div');
-    daysWrapper.id = `${prefix}-days`;
+    const currentDate = new Date();
+
+    const isToday = (day) =>
+      this.#date.getFullYear() === currentDate.getFullYear() &&
+      this.#date.getMonth() === currentDate.getMonth() &&
+      currentDate.getDate() === day;
+
+    const maxDays = new Date(
+      this.#date.getFullYear(),
+      this.#date.getMonth(),
+      0,
+    ).getDate();
+
+    const days = [...Array(maxDays + 1).keys()].slice(1);
+    const daysWrapper = document.createDocumentFragment();
+    daysWrapper.id = `${this.#prefix}-days`;
 
     for (const day of days) {
       const dayNode = document.createElement('div');
 
-      if (currentDay === day) dayNode.className = '--today';
+      if (isToday(day)) dayNode.className = '--today';
 
       dayNode.addEventListener('click', () => {
         const selectedClassName = '--selected';
@@ -86,7 +85,7 @@ class ViotDatePicker {
         )[0];
 
         if (selectedNode) selectedNode.classList.remove(selectedClassName);
-        this.classList.add(selectedClassName);
+        dayNode.classList.add(selectedClassName);
       });
 
       dayNode.innerText = day;
@@ -98,21 +97,12 @@ class ViotDatePicker {
 
   #prevMonth = () => {
     const prevNode = document.createElement('button');
-    prevNode.id = `${prefix}-prev-month`;
+    prevNode.id = `${this.#prefix}-prev-month`;
     prevNode.innerText = '<';
 
     prevNode.addEventListener('click', () => {
-      const prevDate = new Date(this.#date.setMonth(this.#date.getMonth() - 1));
-
-      document.getElementById(
-        `${prefix}-month-name`,
-      ).innerText = prevDate.toLocaleDateString(this.#lang, {
-        month: this.#month,
-      });
-
-      document.getElementById(
-        `${prefix}-year`,
-      ).innerText = prevDate.getFullYear();
+      this.#date = new Date(this.#date.setMonth(this.#date.getMonth() - 1));
+      this.#update();
     });
 
     return prevNode;
@@ -120,21 +110,12 @@ class ViotDatePicker {
 
   #nextMonth = () => {
     const nextNode = document.createElement('button');
-    nextNode.id = `${prefix}-next-month`;
+    nextNode.id = `${this.#prefix}-next-month`;
     nextNode.innerText = '>';
 
     nextNode.addEventListener('click', () => {
-      const nextDate = new Date(this.#date.setMonth(this.#date.getMonth() + 1));
-
-      document.getElementById(
-        `${prefix}-month-name`,
-      ).innerText = nextDate.toLocaleDateString(this.#lang, {
-        month: this.#month,
-      });
-
-      document.getElementById(
-        `${prefix}-year`,
-      ).innerText = nextDate.getFullYear();
+      this.#date = new Date(this.#date.setMonth(this.#date.getMonth() + 1));
+      this.#update();
     });
 
     return nextNode;
@@ -142,7 +123,7 @@ class ViotDatePicker {
 
   #monthName = () => {
     const monthName = document.createElement('span');
-    monthName.id = `${prefix}-month-name`;
+    monthName.id = `${this.#prefix}-month-name`;
     monthName.innerText = this.#date.toLocaleDateString(this.#lang, {
       month: this.#month,
     });
@@ -152,7 +133,7 @@ class ViotDatePicker {
 
   #monthYearWrapper = () => {
     const monthYearWrapper = document.createElement('div');
-    const yearNode = this.#renderYear(this.#date);
+    const yearNode = this.#yearNode(this.#date);
     const monthNode = this.#monthName(this.#lang, this.#date, this.#month);
 
     monthYearWrapper.appendChild(monthNode);
@@ -163,7 +144,7 @@ class ViotDatePicker {
 
   #monthWrapper = () => {
     const monthWrapper = document.createElement('div');
-    monthWrapper.id = `${prefix}-month-wrapper`;
+    monthWrapper.id = `${this.#prefix}-month-wrapper`;
     const prevNode = this.#prevMonth(this.#lang, this.#date, this.#month);
     const monthYearNode = this.#monthYearWrapper(
       this.#lang,
@@ -181,21 +162,12 @@ class ViotDatePicker {
 
   #today = () => {
     const todayNode = document.createElement('button');
-    todayNode.className = `${prefix}-today`;
+    todayNode.className = `${this.#prefix}-today`;
     todayNode.innerText = 'Today';
 
     todayNode.addEventListener('click', () => {
       this.#date = new Date();
-
-      document.getElementById(
-        `${prefix}-month-name`,
-      ).innerText = this.#date.toLocaleDateString(this.#lang, {
-        month: this.#month,
-      });
-
-      document.getElementById(
-        `${prefix}-year`,
-      ).innerText = this.#date.getFullYear();
+      this.#update();
     });
 
     return todayNode;
@@ -203,13 +175,16 @@ class ViotDatePicker {
 
   #render = () => {
     const wrapper = document.createElement('div');
-    wrapper.className = `${prefix}-wrapper`;
+    wrapper.className = `${this.#prefix}-wrapper`;
 
     /* Render all months */
     wrapper.appendChild(this.#monthWrapper());
 
     /* Render all days in this month */
-    wrapper.appendChild(this.#renderDays());
+    const daysWrapper = document.createElement('div');
+    daysWrapper.id = `${this.#prefix}-days`;
+    daysWrapper.appendChild(this.#renderDays());
+    wrapper.appendChild(daysWrapper);
 
     /* today button */
     const todayNode = this.#today();
