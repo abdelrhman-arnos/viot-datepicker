@@ -18,7 +18,19 @@ class ViotDatePicker {
   #day = 'numeric';
   #weekday = 'short';
 
-  constructor({ selector, lang, date, year, month, day }) {
+  #primaryColor = 'slategray';
+  #highlightColor = 'deepskyblue';
+
+  constructor({
+    selector,
+    lang,
+    date,
+    year,
+    month,
+    day,
+    primaryColor,
+    highlightColor,
+  }) {
     this.#selector = selector || this.#selector;
     this.#lang = lang || this.#lang;
     this.#date = date || this.#date;
@@ -26,15 +38,35 @@ class ViotDatePicker {
     this.#month = month || this.#month;
     this.#day = day || this.#day;
 
+    this.#primaryColor = primaryColor || this.#primaryColor;
+    this.#highlightColor = highlightColor || this.#highlightColor;
+
     this.init = (() => {
       const selector = document.getElementById(this.#selector);
       selector.appendChild(this.#render());
+      this.#style();
     })();
   }
 
   getDate() {
     return this.#date;
   }
+
+  #style = () => {
+    const root = document.querySelector(':root');
+
+    root.style.setProperty('--primary-color', this.#primaryColor);
+    root.style.setProperty('--highlight-color', this.#highlightColor);
+  };
+
+  #localeNumbers = (number) => {
+    return (
+      number
+        .toLocaleString(this.#lang)
+        .match(/[٠١٢٣٤٥٦٧٨٩]/g)
+        ?.join('') || number
+    );
+  };
 
   #update = () => {
     const daysWrapper = document.getElementById(`${this.#prefix}-days`);
@@ -46,7 +78,7 @@ class ViotDatePicker {
 
     document.getElementById(
       `${this.#prefix}-year`,
-    ).innerText = this.#date.getFullYear();
+    ).innerText = this.#localeNumbers(this.#date.getFullYear());
 
     daysWrapper.innerHTML = '';
     daysWrapper.append(this.#renderDays());
@@ -55,7 +87,7 @@ class ViotDatePicker {
   #yearNode = () => {
     const yearNode = document.createElement('span');
     yearNode.id = `${this.#prefix}-year`;
-    yearNode.innerText = this.#date.getFullYear();
+    yearNode.innerText = this.#localeNumbers(this.#date.getFullYear());
 
     return yearNode;
   };
@@ -82,24 +114,24 @@ class ViotDatePicker {
   };
 
   #renderDays = () => {
-    const thisDate = new Date();
+    const thisDate = new Date().setHours(0, 0, 0, 0);
     const maxRender = 42;
+    const firstDay = new Date(
+      new Date(this.#date).setDate(this.#date.getDate() - this.#date.getDay()),
+    );
 
     const currentDate = (i) =>
       new Date(this.#date.getFullYear(), this.#date.getMonth(), i);
 
-    const isToday = (day) =>
-      this.#date.getFullYear() === thisDate.getFullYear() &&
-      this.#date.getMonth() === thisDate.getMonth() &&
-      thisDate.getDate() === day;
+    const isToday = (day) => +currentDate(day) === thisDate;
 
     const daysWrapper = document.createDocumentFragment();
     daysWrapper.id = `${this.#prefix}-days`;
 
     for (let i = 0; i < maxRender; i++) {
-      const dayNode = document.createElement('div');
+      const dayNode = document.createElement('span');
 
-      if (isToday(currentDate(i).getDate())) dayNode.classList.add('--today');
+      if (isToday(i)) dayNode.classList.add('--today');
       if (currentDate(i).getMonth() !== this.#date.getMonth())
         dayNode.classList.add('--dimmed');
 
@@ -116,7 +148,7 @@ class ViotDatePicker {
         console.log(this.#date);
       });
 
-      dayNode.innerText = currentDate(i).getDate();
+      dayNode.innerText = currentDate(i).getDate().toLocaleString(this.#lang);
       daysWrapper.appendChild(dayNode);
     }
 

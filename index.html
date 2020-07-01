@@ -7,12 +7,15 @@
     <script src="./index.js"></script>
   </head>
   <body>
-    <input type="date" />
+    <!-- <input type="date" /> -->
     <div id="viot-dp"></div>
     <script>
       const dp = new ViotDatePicker({
+        date: new Date('1991', '03', '27'),
         selector: 'viot-dp',
         month: 'short',
+        primaryColor: '#484848',
+        lang: 'ar-EG',
       });
     </script>
   </body>
